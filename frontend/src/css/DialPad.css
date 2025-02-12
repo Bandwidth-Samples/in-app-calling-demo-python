@@ -1,0 +1,52 @@
+.app-container {
+  width: 322px;
+  height: auto;
+}
+
+.dialpad-container {
+  width: 322px;
+  height: auto;
+  color: var(--blue50);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+  padding: 10px 16px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
+}
+
+h2 {
+  text-transform: uppercase;
+  font-weight: 900;
+  font-size: 1.2rem;
+  margin: 10px 0 20px 0;
+  color: var(--blue50);
+  text-align: center;
+}
+
+.dialed-number {
+  color: black;
+  height: 66px;
+  margin-bottom: 5px;
+  font-family: var(--overpass);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.call-controls {
+  width: 100%;
+  height: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1.2rem;
+  justify-items: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.call-start-end {
+  grid-column: 2 / 3;
+}

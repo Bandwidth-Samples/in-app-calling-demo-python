@@ -1,0 +1,69 @@
+.status-bar {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.webrtc-status {
+  height: 20px;
+  line-height: 20px;
+  width: auto;
+  font-weight: 800;
+}
+
+.status-buttons {
+  width: 100%;
+  height: 20px;
+  display: flex;
+}
+
+.left-button {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 15px;
+  box-sizing: border-box;
+}
+
+.right-button {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 15px;
+  box-sizing: border-box;
+} 
+
+.status-buttons button {
+  color: var(--blue65);
+  text-transform: uppercase;
+  font-size: 14px;
+  line-height: 16px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  background-color: var(--background-color);
+  border: none;
+  border-radius: 11px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.status-bar button svg {
+  margin-right: 3px;
+}
+
+.status-bar button:disabled {
+  color: var(--grey65);
+}
+
+.status-bar button:hover:enabled {
+  cursor: pointer;
+  color: var(--blue70);
+  background-color: var(--blue5);
+}
