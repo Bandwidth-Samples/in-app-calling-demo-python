@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../css/DialPad.css';
+import { refreshToken, isJwtExpired } from '../utils';
 import StatusBar from './StatusBar';
 import DigitGrid from './DigitGrid';
 import NumberInput from './NumberInput';
@@ -10,57 +11,6 @@ import ShortcutOutlinedIcon from '@mui/icons-material/ShortcutOutlined';
 import { BandwidthUA } from '@bandwidth/bw-webrtc-sdk';
 import { useStopwatch } from 'react-timer-hook';
 import { Button } from '@mui/material';
-
-/**
- * Fetches a new JWT from the backend server
- *
- * @returns {Promise<string>}
- */
-async function refreshToken() {
-  const tokenUrl = 'http://localhost:3001/bandwidth/authorization/token';
-
-  try {
-    const response = await fetch(tokenUrl, {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return await response.text();
-  } catch (error) {
-    console.error('Error fetching auth token:', error);
-    throw error;
-  }
-}
-
-/**
- * Checks if the authToken is expired
- *
- * @param jwt
- * @returns {boolean}
- */
-function isJwtExpired(jwt) {
-    const jwtParts = jwt.split('.');
-    if (jwtParts.length !== 3) {
-        return true;
-    }
-
-    try {
-        const payload = JSON.parse(atob(jwtParts[1]));
-        if (payload.exp) {
-        const expirationTime = payload.exp * 1000; // Convert to milliseconds
-        const currentTime = Date.now();
-        return expirationTime < currentTime;
-        }
-    } catch (error) {
-        console.error('Error parsing JWT:', error);
-        return true;
-    }
-
-    return true;
-}
 
 export default function DialPad() {
   const userId = process.env.REACT_APP_BW_FROM_NUMBER;
@@ -97,13 +47,15 @@ export default function DialPad() {
    */
   useEffect( () => {
     const token = async () => {
-      if (!authToken || isJwtExpired(authToken)) {
-        console.log("refreshing token...")
-        setAuthToken(await refreshToken());
+        if (callState !== 'Idle' && callState !== 'Add Number') {
+        if (!authToken || isJwtExpired(authToken)) {
+          console.log("refreshing token...")
+          setAuthToken(await refreshToken());
+        }
       }
     };
     token();
-  }, []);
+  }, [callState]);
 
   /**
    * Connect to the backend WebSocket
@@ -485,13 +437,13 @@ export default function DialPad() {
 
   function renderUI() {
     if (incomingCall) {
-      return <div style={{ backgroundColor: "black", padding: "80px 40px", borderRadius: "10px", textAlign: "center" }}>
+      return (<div style={{ backgroundColor: "black", padding: "80px 40px", borderRadius: "10px", textAlign: "center" }}>
         <h2 style={{ color: "white" }}>Incoming call</h2>
         <h3 style={{ color: "white" }}>Call from: {incomingPayload.fromNumber}...</h3>
         <div style={{ textAlign: "center" }}><Button style={{ backgroundColor: "white", marginRight: "20px" }} onClick={handleAcceptClick}>Accept</Button><Button style={{ backgroundColor: "white" }} color='error' onClick={handleDeclinedClick}>Reject</Button></div>
-      </div>;
+      </div>);
     } else {
-      return <div>
+      return (<div>
         <StatusBar {...statusBarProps} />
         <div className='dialpad-container'>
           <h2>{callStatus}</h2>
@@ -505,7 +457,7 @@ export default function DialPad() {
           </div>
           <video autoPlay id='remote-video-container' style={{ display: 'none' }}></video>
         </div>
-      </div>;
+      </div>);
     }
   }
 

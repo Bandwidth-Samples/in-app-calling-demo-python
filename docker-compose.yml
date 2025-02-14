@@ -13,7 +13,7 @@ services:
     container_name: bandwidth_in_app_backend
     restart: on-failure
     ports:
-      - "3001:8080"
+      - "3001:3001"
     depends_on:
       - redis
     env_file:

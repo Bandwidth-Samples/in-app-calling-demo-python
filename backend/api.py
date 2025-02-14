@@ -57,7 +57,12 @@ def fetch_bandwidth_token() -> str:
     payload = {
         "grant_type": "client_credentials"
     }
-    r = requests.post(bandwidth_token_url, auth=(BW_USERNAME, BW_PASSWORD), headers=headers, data=payload)
+    try:
+        r = requests.post(bandwidth_token_url, auth=(BW_USERNAME, BW_PASSWORD), headers=headers, data=payload)
+        r.raise_for_status()
+    except Exception as e:
+        logger.error(f"Error fetching Bandwidth token: {e}. HTTP status code was {r.status_code}. Did you set your BW_USERNAME and BW_PASSWORD environment variables?")
+
     return r.json()["access_token"]
 
 def generate_jwt() -> str:
@@ -69,8 +74,12 @@ def generate_jwt() -> str:
     global bandwidth_auth_token
 
     if not bandwidth_auth_token:
-        bandwidth_auth_token = fetch_bandwidth_token()
-
+        try:
+            bandwidth_auth_token = fetch_bandwidth_token()
+        except Exception as e:
+            logger.error(f"Error fetching Bandwidth token: {e}")
+            bandwidth_auth_token = ""
+            raise e
     try:
         jwt.decode(bandwidth_auth_token, options={"verify_signature": False})
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
@@ -151,10 +160,10 @@ def get_bandwidth_token() -> Response:
         token = generate_jwt()
     except Exception as e:
         logger.error(f"Error generating JWT: {e}")
-        return Response(status_code=500, content="Error generating JWT")
+        return Response(status_code=401, content="Error generating JWT. Did you set your BW_USERNAME and BW_PASSWORD environment variables?")
 
     # return token with quotes removed
-    return Response(content=generate_jwt(), headers={"Content-Type": "text/plain"})
+    return Response(content=token, headers={"Content-Type": "text/plain"})
 
 
 @app.websocket("/bandwidth/notifications/ws")
@@ -275,4 +284,4 @@ def start_server(port: int) -> None:
 
 
 if __name__ == "__main__":
-    start_server(8080)
+    start_server(3001)
