@@ -355,7 +355,7 @@ export default function DialPad() {
   const handleDigitClick = (value) => {
     console.log("handleDigitClick");
     activeCall ? activeCall.sendDTMF(value) : setDestNumber((destNumber) => destNumber.concat(value));
-  }
+  };
 
   const handlePhoneNumber = (e) => {
     console.log("handlePhoneNumber");
