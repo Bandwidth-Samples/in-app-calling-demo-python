@@ -25,9 +25,9 @@ The app is built using a React frontend and a python FastAPI backend, using Redi
 
 In order to use the Bandwidth API, users need to set up the appropriate application at the [Bandwidth Dashboard](https://dashboard.bandwidth.com/) and create an API user.
 
-To create an application log into the [Bandwidth Dashboard](https://dashboard.bandwidth.com/) and navigate to the `Applications` tab.  Fill out the **New Application** form selecting the service (Voice) that the application will be used for.  All Bandwidth services require publicly accessible Callback URLs, for more information on how to set one up see [Callback URLs](#callback-urls).
+To create an application, log into the [Bandwidth Dashboard](https://dashboard.bandwidth.com/) and navigate to the `Applications` tab.  Fill out the **New Application** form; selecting the service (Voice) that the application will be used for.  All Bandwidth services require publicly accessible Callback URLs, for more information on how to set one up see [Callback URLs](#callback-urls).
 
-For more information about API credentials see our [Account Credentials](https://dev.bandwidth.com/docs/account/credentials) page.
+For more information about API credentials see our [Account Credentials](https://dev.bandwidth.com/docs/credentials) page.
 
 When configuring your application, make sure to set the `Call-Initiated Callback URL` as `http://<your-ngrok-url>/bandwidth/webhooks/voice/initiate` and the `Call Status Callback URL` as `http://<your-ngrok-url>/bandwidth/webhooks/voice/disconnect`.
 
