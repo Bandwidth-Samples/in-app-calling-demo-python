@@ -101,7 +101,7 @@ export default function DialPad() {
         console.log("refreshing token...")
         setAuthToken(await refreshToken());
       }
-    }
+    };
     token();
   }, []);
 
