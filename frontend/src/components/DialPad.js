@@ -63,12 +63,12 @@ function isJwtExpired(jwt) {
 }
 
 export default function DialPad() {
-  console.log("Dialpad rendering...");
   const userId = process.env.REACT_APP_BW_FROM_NUMBER;
 
   const { totalSeconds, seconds, minutes, hours, start, pause, reset } = useStopwatch({ autoStart: false });
 
   const [destNumber, setDestNumber] = useState('');
+  const [displayNumber, setDisplayNumber] = useState('');
   const [webRtcStatus, setWebRtcStatus] = useState('Idle');
   const [callStatus, setCallStatus] = useState('Add Number');
   const [destNumberValid, setDestNumberValid] = useState(false);
@@ -203,7 +203,7 @@ export default function DialPad() {
   useEffect(() => {
     phone.setListeners({
       loginStateChanged: function (isLogin, cause) {
-        console.log(cause);
+        console.log("Phone state changed. Cause: " + cause);
         // eslint-disable-next-line default-case
         switch (cause) {
           case 'connected':
@@ -248,6 +248,10 @@ export default function DialPad() {
         setOnHold(false);
         setOnMute(false);
         setCallConfirmed(false);
+        setIncomingCall(false);
+        setIncomingPayload({});
+        setDisplayNumber('');
+        setDestNumber('');
         console.log(`Call terminated: ${cause}`);
         console.log('call_terminated_panel');
       },
@@ -339,6 +343,15 @@ export default function DialPad() {
     setCallInitiate(false);
   }, [initiateCall]);
 
+  useEffect(() => {
+    // Sets the display number for the dialer - if outbound, the number you dialed. If inbound, the number that called you
+    if (incomingCall) {
+      setDisplayNumber(incomingPayload.fromNumber.replace('+', ''));
+    } else {
+      setDisplayNumber(destNumber);
+    }
+  }, [destNumber]);
+
   const handleDigitClick = (value) => {
     console.log("handleDigitClick");
     activeCall ? activeCall.sendDTMF(value) : setDestNumber((destNumber) => destNumber.concat(value));
@@ -358,9 +371,10 @@ export default function DialPad() {
     console.log("handleAcceptClick");
     if (incomingPayload.fromNumber) {
       console.log("handleAcceptClick Number: %s", incomingPayload.fromNumber);
-      setDestNumber(incomingPayload.fromNumber.replace('+', ''));
-      setIncomingCall(false);
-      setIncomingPayload({});
+      if (incomingCall) {
+        setDestNumber(userId.replace('+', ''));
+      }
+      setDisplayNumber(incomingPayload.fromNumber.replace('+', ''));
       setCallState("In-Call");
       setCallInitiate(true);
     } else {
@@ -387,6 +401,10 @@ export default function DialPad() {
         setActiveCall(value);
       });
       setDialedNumber(`+${destNumber}`);
+      if (incomingCall) {
+        setDisplayNumber(incomingPayload.fromNumber.replace('+', ''));
+        setIncomingCall(false);
+      }
       setAllowHangup(true);
       setAllowBackspace(false);
       reset();
@@ -439,7 +457,7 @@ export default function DialPad() {
 
   const numberInputProps = {
     onChange: handlePhoneNumber,
-    value: destNumber
+    value: displayNumber
   };
 
   const endCallButtonProps = {
@@ -477,7 +495,7 @@ export default function DialPad() {
         <StatusBar {...statusBarProps} />
         <div className='dialpad-container'>
           <h2>{callStatus}</h2>
-          {!allowHangup ? <NumberInput {...numberInputProps} /> : <div className='dialed-number'>{dialedNumber}</div>}
+          {!allowHangup ? <NumberInput {...numberInputProps} /> : <div className='dialed-number'>{displayNumber}</div>}
           <DigitGrid onClick={handleDigitClick} />
           <div className='call-controls'>
             <div className='call-start-end'>
