@@ -38,7 +38,7 @@ The sample app uses the below environmental variables. The can be configured in 
 ```sh
 BW_USERNAME                          # Your Bandwidth API Username
 BW_PASSWORD                          # Your Bandwidth API Password
-BW_FROM_NUMBER                       # The Bandwidth phone number involved with this application
+BW_FROM_NUMBER                       # The Bandwidth phone number involved with this application in E.164 format
 ```
 
 # Running the Application
@@ -71,10 +71,10 @@ Below are the callback paths:
 ## Ngrok
 
 A simple way to set up a local callback URL for testing is to use the free tool [ngrok](https://ngrok.com/).  
-After you have downloaded and installed `ngrok` run the following command to open a public tunnel to your port (`$LOCAL_PORT`)
+After you have downloaded and installed `ngrok` run the following command to open a public tunnel to your port (3001 in this case for the backend)
 
 ```sh
-ngrok http $LOCAL_PORT
+ngrok http 3001
 ```
 
 You can view your public URL at `http://127.0.0.1:4040` after ngrok is running.  You can also view the status of the tunnel and requests/responses here.
