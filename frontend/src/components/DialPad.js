@@ -387,7 +387,7 @@ export default function DialPad() {
     setCallState("Idle");
     setIncomingCall(false);
     setIncomingPayload({});
-  }
+  };
 
   const handleDialClick = () => {
     console.log("handleDialClick");
