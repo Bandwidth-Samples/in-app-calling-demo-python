@@ -1,0 +1,38 @@
+services:
+  redis:
+    image: redis:7.4.2
+    pull_policy: missing
+    container_name: bandwidth_in_app_redis
+    ports:
+      - "6379:6379"
+    command: [sh, -c, "rm -f /data/dump.rdb && redis-server"]
+  backend:
+    build:
+        context: .
+        dockerfile: ./backend/Dockerfile
+    container_name: bandwidth_in_app_backend
+    restart: on-failure
+    ports:
+      - "3001:3001"
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    links:
+      - redis
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: bandwidth_in_app_frontend
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - backend
+    env_file:
+      - .env
+    links:
+      - redis
+      - backend

@@ -1,0 +1,29 @@
+:root {
+  --white: rgb(255, 255, 255);
+  --grey15: rgb(218, 217, 217);
+  --grey20: rgb(205, 204, 205);
+  --grey55: rgb(119, 116, 118);
+  --grey65: rgb(94, 90, 92);
+  --grey80: rgb(58, 53, 55);
+  --maroon50: rgb(101, 43, 81);
+  --red55: rgb(196, 56, 55);
+  --red90: rgb(50, 14, 17);
+  --yellow65: rgb(177, 144, 20);
+  --green65: rgb(2, 134, 99);
+  --green90: rgb(7, 40, 32);
+  --blue5: rgb(230, 245, 253);
+  --blue25: rgb(131, 205, 246);
+  --blue50: rgb(7, 156, 238);
+  --blue65: rgb(7, 110, 168);
+  --blue70: rgb(7, 94, 145);
+  --blue75: rgb(8, 79, 122);
+  --background-color: var(--white);
+  --overpass: 'Overpass', sans-serif;
+  --button-size: 82px;
+  font-family: var(--overpass);
+}
+
+body {
+  margin: 0;
+  background-color: var(--background-color);
+}
