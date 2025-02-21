@@ -47,12 +47,10 @@ export default function DialPad() {
    */
   useEffect( () => {
     const token = async () => {
-        if (callState !== 'Idle' && callState !== 'Add Number') {
         if (!authToken || isJwtExpired(authToken)) {
           console.log("refreshing token...")
           setAuthToken(await refreshToken());
         }
-      }
     };
     token();
   }, [callState]);
