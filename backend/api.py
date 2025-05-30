@@ -2,6 +2,8 @@ import asyncio
 import json
 import logging
 import os
+import base64
+import binascii
 
 from bandwidth.models import InitiateCallback, DisconnectCallback, RedirectCallback
 from bandwidth.models.bxml import Response as BxmlResponse
@@ -203,6 +205,23 @@ def handle_disconnect(callback: DisconnectCallback):
     logger.debug(callback)
     return
 
+def decode_base64_uui(encoded_string):
+    """
+    Decode the UUI Assuming that it is base64 encoded (see notes in quickstart) 
+
+    :param encoded_string: the uui string in Base64 format
+    :return: the decoded UUI as a string, or an error string.
+    """
+    try:
+        encoded_bytes = encoded_string.encode('ascii')
+        decoded_bytes = base64.b64decode(encoded_bytes)
+        decoded_string = decoded_bytes.decode('ascii')
+        python_dict = json.loads(decoded_string)
+        return python_dict
+    except binascii.Error:
+        return "Invalid Base64 string"
+    except Exception as e:
+        return f"An error occurred: {e}"
 
 @app.post("/bandwidth/webhooks/voice/initiate")
 def handle_inbound_call(callback: InitiateCallback) -> Response:
@@ -215,10 +234,21 @@ def handle_inbound_call(callback: InitiateCallback) -> Response:
     """
     logger.info(f"Received inbound call from {callback.var_from}")
     logger.debug(callback)
+    if callback.uui:
+    # if hasattr(callback,'uui'):
+        # Base 64 is used to encode the context information to avoid communications network parsing errors.
+        application_context = decode_base64_uui(callback.uui)
+        logger.debug(f"received UUI Base64:{callback.uui}")
+        logger.debug('Application Context from UUI: %s',application_context)
+    customer_call_id = redis_client.get("inbound_call_id")
+    logger.debug(f"cached other-call UUI:{customer_call_id}")
 
-    if callback.var_from == IN_APP_CALLING_NUMBER:
+    if ( callback.var_from == IN_APP_CALLING_NUMBER ) and ( customer_call_id == application_context["callId"]):
+        # The UUI contains the callid of the call that is being bridged to.
+        # the UUI is the Application Context that is used to allow a client with the correct context to particpate in the service
+        # The UUI value can be anything that provides the required service context - in this case
+        # the call_id of the other leg of the call was just convenient.
         logger.info("Received call from our agent to bridge")
-        customer_call_id = redis_client.get("inbound_call_id")
         bridge = Bridge(target_call=customer_call_id)
         response = BxmlResponse([bridge])
         return Response(status_code=200, content=response.to_bxml(), media_type="application/xml")
@@ -228,8 +258,8 @@ def handle_inbound_call(callback: InitiateCallback) -> Response:
         message = {
             "type": "call",
             "data": {
-                "fromNumber": callback.var_from,
-                "callId": callback.call_id
+                "fromNumber": callback.var_from,  # Application Context for use in bridging call
+                "callId": callback.call_id        # Application Context for context in bridging call
             }
         }
         redis_client.publish("calls", json.dumps(message))
