@@ -345,8 +345,18 @@ export default function DialPad() {
       setCallState("Calling");
       setCallStatus('Calling');
       setWebRtcStatus('Ringing');
-      let extraHeaders = [`User-to-User:eyJhbGciOiJIUzI1NiJ9.WyJoaSJd.-znkjYyCkgz4djmHUPSXl9YrJ6Nix_XvmlwKGFh5ERM;encoding=jwt;aGVsbG8gd29ybGQ;encoding=base64`];
+
       console.log("Dialed number: ", destNumber);
+            
+      let extraHeaders = [];
+      if (incomingPayload.callId) {
+        console.log("Incomming payload: ", incomingPayload);
+        const appContextString = JSON.stringify(incomingPayload);
+        const appContextB64 = btoa(unescape(encodeURIComponent(appContextString)));
+        //const callIdB64 = btoa(incomingPayload.callId);
+        extraHeaders = [`User-to-User:`+appContextB64+`;encoding=base64`];
+        console.log("extraHeaders:", extraHeaders);
+      }
       phone.makeCall(`${destNumber}`, extraHeaders).then((value) => {
         setActiveCall(value);
       });
